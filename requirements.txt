@@ -1,0 +1,5 @@
+crewai
+chatlit
+psycopg2-binary
+langchain
+
