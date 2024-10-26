@@ -1,5 +1,5 @@
 crewai
-chatlit
+chainlit
 psycopg2-binary
 langchain
 
