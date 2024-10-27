@@ -9,9 +9,13 @@ To overcome these limitations, we implemented a solution using "Agentic LLMs" a 
 
 
 **TODO and Requirements**
+
 Ensure that Python version is at least 3.10 for compatibility with this project.
+
 Run the following command to install all required dependencies: pip install -r requirements.txt
+
 Download the serviceAccountKey.json file into the project repository from google cloud. This file is necessary for accessing Google Cloud resources, such as connecting to Google Cloud SQL databases, using Gemini services, and other Google Cloud functionalities.
+
 Run the Chainlit Application: chainlit run chainlit_app.py
 
 
