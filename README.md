@@ -1,4 +1,4 @@
-**Overview**
+# Multi Agent Chat Assistant
 
 Our project focuses on developing a comprehensive health and wellness chat assistant powered by large language models (LLMs) that can assist users across a variety of domains. The challenge we're addressing involves effectively utilizing LLMs' capabilities while avoiding hallucinations and misinformation. When LLMs have broad, unrestricted scopes, they tend to generate more inaccurate or irrelevant responses, and fine tuning them for each specific case requires large volumes of data and significant resources. Instructional prompting is a partial solution, but as the number of domains and instructions grows, it often results in overly generalized responses.
 
