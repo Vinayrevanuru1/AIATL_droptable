@@ -132,12 +132,9 @@ async def on_message(message):
             await cl.Message(content=greeting_message).send()
             await display_past_interactions(email, memory)  # Pass email to fetch past interactions
         else:
-            # Failed login attempt
-            await cl.Message(content="Invalid credentials. Please restart the chat and try again.").send()
-            # Manually clear session variables instead of using clear()
-            cl.user_session.set("authenticated", None)
-            cl.user_session.set("email", None)
-            cl.user_session.set("login_state", None)
+            # Failed login attempt; loop back to ask for email again
+            cl.user_session.set("login_state", "awaiting_email")
+            await cl.Message(content="Invalid credentials. Please enter your Email to try again.").send()
 
     elif cl.user_session.get("authenticated"):
         # Process user questions if authenticated
@@ -161,3 +158,4 @@ async def on_message(message):
         await cl.Message(content=response).send()
     else:
         await cl.Message(content="Please log in to access the chat. Restart the chat to try again.").send()
+
