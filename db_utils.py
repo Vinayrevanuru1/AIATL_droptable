@@ -1,7 +1,10 @@
 # db_utils.py
 import psycopg2
+from psycopg2.extras import RealDictCursor
+import bcrypt
+from datetime import datetime
 
-# Database connection
+# Database connection setup
 conn = psycopg2.connect(
     database="postgres",
     user="Yaniv",
@@ -10,18 +13,29 @@ conn = psycopg2.connect(
     port="5432"
 )
 
-def get_patient_context(patient_id):
-    """Retrieve patient data and set up initial memory context for chat."""
+def verify_login(email, password):
+    """Verify user credentials by comparing hashed password from the database using email."""
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT password FROM users WHERE email_address = %s;", (email,))
+        user_data = cursor.fetchone()
+
+    if user_data:
+        stored_password = user_data[0]
+        # Compare the hashed password stored in the database with the provided password
+        return bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8'))
+    return False
+
+def get_patient_context(email):
+    """Retrieve patient data and set up initial memory context for chat using email."""
     cursor = conn.cursor()
-    cursor.execute('''SELECT * FROM users WHERE user_id = %s;''', (patient_id,))
+    cursor.execute("SELECT * FROM users WHERE email_address = %s;", (email,))
     patient_data = cursor.fetchone()
     cursor.close()
 
-    # Format patient data into memory context if available
     if patient_data:
         patient_context = {
             "description": "Patient information",
-            "expected_output": f"Context for patient ID {patient_id}",
+            "expected_output": f"Context for patient email {email}",
             "content": {
                 "ID": patient_data[0],
                 "password": patient_data[1],
@@ -40,3 +54,24 @@ def get_patient_context(patient_id):
         return [patient_context], greeting_message
     else:
         return [], "Patient not found."
+
+def get_conversations(email):
+    """Retrieve past conversations for a given email."""
+    with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+        cursor.execute("SELECT question, response, timestamp FROM conversations WHERE user_id = (SELECT user_id FROM users WHERE email_address = %s) ORDER BY timestamp;", (email,))
+        conversations = cursor.fetchall()
+    return conversations
+
+def save_conversation(user_id, question, response):
+    """Save a new conversation to the database."""
+    with conn.cursor() as cursor:
+        timestamp = datetime.now()  # Current timestamp
+        cursor.execute(
+            """
+            INSERT INTO conversations (user_id, timestamp, question, response)
+            VALUES (%s, %s, %s, %s);
+            """,
+            (user_id, timestamp, question, response)
+        )
+    conn.commit()
+
